@@ -23,7 +23,7 @@ class App:
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE ):
-                pg.QUIT()
+                pg.QUIT
                 sys.exit()
     
     def run(self):
