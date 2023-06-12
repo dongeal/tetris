@@ -3,6 +3,7 @@ import math
 from tetromino import Tetromino
 import pygame.freetype as ft
 
+
 class Text:
     def __init__(self, app):
         self.app = app
@@ -21,7 +22,14 @@ class Text:
         self.font.render_to(self.app.screen,(WIN_W * 0.64, WIN_H * 0.8),
                             text=f'{self.app.tetris.score}', fgcolor= 'white',
                             size=TILE_SIZE* 1.8)
-       
+        if self.app.tetris.gameover: # 게임오버 표시
+            self.font.render_to(self.app.screen,(WIN_W * 0.2, WIN_H * 0.5),
+                            text= 'Game Over', fgcolor= 'red',
+                            size=TILE_SIZE* 1.4, bgcolor='black')
+
+
+
+  
 class Tetris:
     def __init__(self, app):
         self.app = app
@@ -34,11 +42,12 @@ class Tetris:
         self.score = 0
         self.full_lines = 0
         self.points_per_line ={0:0, 1:100, 2:300, 3:700, 4:1500}
-    
+        self.gameover = False
+        self.drop = False
     def get_score(self):
         self.score += self.points_per_line[self.full_lines]
         self.full_lines = 0
-
+        
     def check_full_lines(self):
         row = FIELD_H - 1
         for y in range(FIELD_H-1, -1, -1):
@@ -72,11 +81,12 @@ class Tetris:
 
     def check_tetromino_landing(self):
         if self.tetromino.landing:
-            if self.is_game_over():
-                # self.__init__(self.app)
-                pass
-
+            if self.is_game_over():    
+                self.gameover = True
+              
+                #self.__init__(self.app)
             else:
+                self.drop = False
                 self.speed_up = False
                 self.put_tetromino_blocks_in_array()
                 self.next_tetromino.current = True
@@ -92,6 +102,8 @@ class Tetris:
             self.tetromino.rotate()
         elif pressed_key == pg.K_DOWN:
             self.speed_up = True
+        elif pressed_key == pg.K_SPACE:
+            self.drop = True
 
     def draw_grid(self):
         for x in range(FIELD_W):
@@ -107,7 +119,10 @@ class Tetris:
             self.tetromino.update()
             self.check_tetromino_landing()
             self.get_score()
-            # self.speed_up = False  # 쭉 내려오는거 끔
+            if self.drop: # 쭉 내려오는거 켬
+                self.speed_up = True
+            else: 
+                self.speed_up = False 
     
         self.sprite_group.update()
         
